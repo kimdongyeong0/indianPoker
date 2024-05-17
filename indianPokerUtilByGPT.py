@@ -1,10 +1,12 @@
-import random
-import numpy as np
+from indianPoker import Algorithm
+
+clearBoard = "\n\n\n\n\n\n\n\n\n" * 100
 
 
 class Player:
     def __init__(self):
-        self.deck = [i for i in range(1, 11)] * 2
+        self.deck = [i for i in range(1, 11)]
+        self.deck = 2 * self.deck
         self.point = 100
 
     def call(self, bet, currentBet):
@@ -20,75 +22,8 @@ class Player:
             return None
 
 
-class QLearningAgent:
-    def __init__(self, state_size, action_size):
-        self.state_size = state_size
-        self.action_size = action_size
-        self.q_table = np.zeros((state_size, action_size))
-        self.alpha = 0.1  # learning rate
-        self.gamma = 0.95  # discount rate
-        self.epsilon = 1.0  # exploration rate
-        self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
-
-    def act(self, state):
-        if np.random.rand() <= self.epsilon:
-            return random.randrange(self.action_size)
-        return np.argmax(self.q_table[state])
-
-    def update_q_value(self, state, action, reward, next_state):
-        best_next_action = np.argmax(self.q_table[next_state])
-        td_target = reward + self.gamma * self.q_table[next_state][best_next_action]
-        td_error = td_target - self.q_table[state][action]
-        self.q_table[state][action] += self.alpha * td_error
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
-
-
-class Algorithm:
-    def __init__(self):
-        self.deck = [i for i in range(1, 11)] * 2
-        self.point = 100
-        self.state_size = 100  # Example state size, modify based on actual state space
-        self.action_size = 2  # For simplicity: 0 = low bet, 1 = high bet
-        self.agent = QLearningAgent(self.state_size, self.action_size)
-
-    def get_state(self):
-        deck_sum = sum(self.deck)
-        return deck_sum
-
-    def pick(self) -> int:
-        state = self.get_state()
-        action = self.agent.act(state)
-        if action == 0:
-            card = self.deck.pop(random.randint(0, len(self.deck) - 1))
-        else:
-            card = self.deck.pop(self.deck.index(max(self.deck)))
-        return card
-
-    def giveUp(self, currentBet) -> bool:
-        state = self.get_state()
-        action = self.agent.act(state)
-        return action == 0
-
-    def raiseBet(self, currentBet) -> int:
-        state = self.get_state()
-        action = self.agent.act(state)
-        if action == 0:
-            return int(1.5 * currentBet)
-        else:
-            return currentBet
-
-    def bet(self) -> int:
-        state = self.get_state()
-        action = self.agent.act(state)
-        if action == 0:
-            return 10
-        else:
-            return 20
-
-
-clearBoard = "\n\n\n\n\n\n\n\n\n" * 100
+class AI(Algorithm):
+    pass
 
 
 def main():
@@ -109,8 +44,8 @@ def main():
                     "Player1's turn to choose card, which card do you wish to pick? (1-10): "
                 )
                 f1 = p1.move(c1)
-                while c1 not in [str(i) for i in range(1, 11)] or f1 is None:
-                    if f1 is None:
+                while c1 not in [str(i) for i in range(1, 11)] or f1 == None:
+                    if f1 == None:
                         c1 = input(
                             "The Card you are trying to pull does not exist, please choose again, (1-10): "
                         )
@@ -126,8 +61,8 @@ def main():
                     "Player2's turn to choose card, which card do you wish to pick? (1-10): "
                 )
                 f2 = p2.move(c2)
-                while c2 not in [str(i) for i in range(1, 11)] or f2 is None:
-                    if f2 is None:
+                while c2 not in [str(i) for i in range(1, 11)] or f2 == None:
+                    if f2 == None:
                         c2 = input(
                             "The Card you are trying to pull does not exist, please choose again, (1-10): "
                         )
@@ -167,7 +102,7 @@ def main():
                 while b1 != b2:
                     print(
                         "\n\nAmounts of the betting are different, starting raise and call session.\nHighest Bet: {}".format(
-                            max(b1, b2)
+                            b1 if b1 > b2 else b2
                         )
                     )
                     if b1 < b2:
@@ -276,8 +211,8 @@ def main():
                     "Player1's turn to choose card, which card do you wish to pick? (1-10): "
                 )
                 f1 = p1.move(c1)
-                while c1 not in [str(i) for i in range(1, 11)] or f1 is None:
-                    if f1 is None:
+                while c1 not in [str(i) for i in range(1, 11)] or f1 == None:
+                    if f1 == None:
                         c1 = input(
                             "The Card you are trying to pull does not exist, please choose again, (1-10): "
                         )
@@ -312,7 +247,7 @@ def main():
                 while b1 != b2:
                     print(
                         "\n\nAmounts of the betting are different, starting raise and call session.\nHighest Bet: {}".format(
-                            max(b1, b2)
+                            b1 if b1 > b2 else b2
                         )
                     )
                     if b1 < b2:
@@ -444,7 +379,3 @@ def main():
         elif mode.lower() == "quit":
             print("\nThank you for playing the game! Come again!")
             break
-
-
-if __name__ == "__main__":
-    main()
