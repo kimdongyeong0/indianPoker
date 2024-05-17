@@ -11,15 +11,15 @@ class SimpleDNN:
         self.weights2 = np.random.randn(hidden_size, output_size) * 0.01
         self.biases2 = np.zeros((1, output_size))
 
-    def relu(self, z):
-        return np.maximum(0, z)
+    def relu6(self, z):
+        return np.min(max(0, z), 6)
 
-    def relu_derivative(self, z):
-        return z > 0
+    def relu6_derivative(self, z):
+        return (z > 0) & (z < 0)
 
     def forward(self, x):
         self.z1 = np.dot(x, self.weights1) + self.biases1
-        self.a1 = self.relu(self.z1)
+        self.a1 = self.relu6(self.z1)
         self.z2 = np.dot(self.a1, self.weights2) + self.biases2
         return self.z2  # Linear output
 
@@ -30,7 +30,7 @@ class SimpleDNN:
         dw2 = np.dot(self.a1.T, dz2) / m
         db2 = np.sum(dz2, axis=0, keepdims=True) / m
 
-        dz1 = np.dot(dz2, self.weights2.T) * self.relu_derivative(self.z1)
+        dz1 = np.dot(dz2, self.weights2.T) * self.relu6_derivative(self.z1)
         dw1 = np.dot(x.T, dz1) / m
         db1 = np.sum(dz1, axis=0, keepdims=True) / m
 
