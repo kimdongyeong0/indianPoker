@@ -1,5 +1,4 @@
 from indianPoker import Algorithm
-import random
 
 
 class Player:

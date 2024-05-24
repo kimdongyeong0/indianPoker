@@ -1,5 +1,4 @@
 import indianPokerUtil as util
-import numpy as np
 import random
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
