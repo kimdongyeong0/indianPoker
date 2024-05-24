@@ -81,12 +81,10 @@ class Algorithm:
             return False
 
     def raiseBet(self, currentBet) -> int:
-        card = self.history[-1] if self.history else -1
-        if card > 7:
-            finalBet = currentBet + random.randint(3, 7)
-        else:
-            finalBet = currentBet + random.randint(1, 4)
-        self.point -= finalBet - currentBet
+        card = self.current_card if self.current_card else -1
+        additional_bet = min(self.point, random.randint(1, 4))
+        finalBet = currentBet + additional_bet
+        self.point -= additional_bet
         return finalBet
 
     def bet(self) -> int:

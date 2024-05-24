@@ -21,103 +21,6 @@ class Player:
             return None
 
 
-# sample AI from Sol Choi / (semi) Greedy algorithm / @@@@@@@@@ can be ignored @@@@@@@@@
-# class AI:
-#     def __init__(self):
-#         self.deck = [i for i in range(1,11)]
-#         self.deck = 2 * self.deck
-#         self.deck.sort()
-#         self.point = 100
-#         self.picked = 0
-
-#     # Pick cards strategically
-#     def pick(self):
-#         card = 0
-#         if self.point >= 70:
-#             rng = len(self.deck) - 6
-#             if rng >= 0:
-#                 card = self.deck.pop(random.randint(0, rng))
-#             else:
-#                 # print(self.deck)
-#                 card = self.deck.pop(random.randint(0, len(self.deck)-1))
-#             self.picked = int(card)
-#         else:
-#             card = self.deck.pop(self.deck.index(max(self.deck)))
-#             self.picked = card
-#         # print("Card picked:", card)
-#         return card
-
-#     # Decide giving up or not
-#     def giveUp(self, currentBet):
-#         if int(0.9 * currentBet) > self.point:
-#             if self.picked > 8:
-#                 return False
-#             return True
-#         else:
-#             if self.picked <= 2:
-#                 return True
-#             return False
-
-#     # Decide raise or give up
-#     def raiseBet(self, currentBet):
-#         f = random.randint(0,1)
-#         if f:
-#             final = int(1.5 * currentBet)
-#             if self.point >= final:
-#                 self.point -= final
-#                 return final
-#             elif currentBet > self.point:
-#                 self.point -= currentBet
-#                 return currentBet
-#             else: # Dangerous situation
-#                 if self.picked <= 7:
-#                     self.point -= currentBet
-#                     return currentBet
-#                 temp = self.point
-#                 self.point = 0
-#                 return temp
-#         else:
-#             self.point -= currentBet
-#             return currentBet
-
-#     # Bet according to the cards
-#     def bet(self):
-#         temp = self.point
-#         if self.point <= 10:
-#             self.point -= temp
-#             return temp
-
-#         if self.picked in [1,2,3]:
-#             self.point -= 10
-#             return 10
-
-#         elif self.picked in [4,5,6,7]:
-
-#             if temp <= 20:
-#                 self.point = 0
-#                 return temp
-
-#             while self.point - temp <= 0:
-#                 temp = random.randint(2, 3) * 10
-#             self.point -= temp
-#             return temp
-
-#         else:
-
-#             if temp <= 30:
-#                 self.point = 0
-#                 return temp
-
-#             while self.point - temp <= 0:
-#                 temp = random.randint(3, 5) * 10
-#             self.point -= temp
-#             return temp
-
-
-class AI(Algorithm):
-    pass
-
-
 clearBoard = "\n\n\n\n\n\n\n\n\n" * 100
 
 
@@ -435,6 +338,7 @@ def main():
                 # Initialize bet amount
                 b1 = int(p1.bet())
                 b2 = int(p2.bet())
+                print(b1, b2)
 
                 while b1 != b2:
                     if b1 < b2:
@@ -457,6 +361,8 @@ def main():
                             print("AI2 has given up.")
                             f2 = -1
                             break
+                    if p1.point <= 0 or p2.point <= 0 or b1 > 100 or b2 > 100:
+                        break
 
                 # @@@@@@@@@@@ Judgement phase @@@@@@@@@@@
                 print("\n\n")
