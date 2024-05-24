@@ -1,4 +1,6 @@
 import indianPokerUtil as util
+import numpy as np
+import random
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # "Algorithm" modification parts where "Participants" have to modify  #
@@ -18,7 +20,7 @@ import indianPokerUtil as util
 #   3.2. One can decide to call the bet, and the card reveal will start to begin
 #   3.3. One can decide to raise the bet, and the other one has to repeat #3 until they run out of the points in possession.
 # 4. Bets are now matched, reveal the cards, and judge who won the current round.
-# 5. Repeat the procedure until one's card run out or one's point run out. 
+# 5. Repeat the procedure until one's card run out or one's point run out.
 
 # @@@@@@@@@@@@@@@@@@ 게임규칙 @@@@@@@@@@@@@@@@@@
 # 1. 각 플레이어는 대표할 카드를 선택합니다.
@@ -50,34 +52,79 @@ import indianPokerUtil as util
 # If none of these are understandable, please see "aivai" part in main methods
 # CMD + F or Ctrl + F -> type mode == 'aivai' -> second one
 
+
 # @TODO: class Algorithm is for you to modify in order to make the strongest algorithm ever.
 class Algorithm:
     def __init__(self):
-        self.deck = [i for i in range(1,11)]
+        self.deck = [i for i in range(1, 11)]
         self.deck = 2 * self.deck
         self.point = 100
-    
+        self.history = []
+        self.current_card = None
+
     def pick(self) -> int:
-        # @TODO: How to pick the cards? It can be random, but if you have any other strategy, please feel free to implement them here
-        card = 0
+        if not self.deck:
+            return -1  # No cards left
+        card = random.choice(self.deck)
+        self.deck.remove(card)
+        self.history.append(card)
+        self.current_card = card
         return card
-    
+
     def giveUp(self, currentBet) -> bool:
-        # @TODO: According to bets given, would you like to give up this round or not? 
-        return False
-    
+        card = self.history[-1] if self.history else -1
+        if card < 4 and currentBet > 5:
+            return True
+        elif card < 7 and currentBet > 8:
+            return True
+        else:
+            return False
+
     def raiseBet(self, currentBet) -> int:
-        # @TODO: If you chose to raise the bet and follow up, how much would you like to raise the bet? 
-        finalBet = 0
+        card = self.history[-1] if self.history else -1
+        if card > 7:
+            finalBet = currentBet + random.randint(3, 7)
+        else:
+            finalBet = currentBet + random.randint(1, 4)
+        self.point -= finalBet - currentBet
         return finalBet
-    
+
     def bet(self) -> int:
-        # @TODO: In the beginning, how would you like to start your bet? 
-        currentBet = 0
+        card = self.pick()
+        if card == -1:
+            return 0
+        if card > 8:
+            currentBet = random.randint(7, 13)
+        elif card > 6:
+            currentBet = random.randint(4, 8)
+        elif card > 3:
+            currentBet = random.randint(2, 5)
+        else:
+            currentBet = random.randint(1, 3)
+        self.point -= currentBet
         return currentBet
-            
+
+    def update_strategy(self, result, opponent_bet):
+        if result == "win":
+            for i, card in enumerate(self.history):
+                if card > 7:
+                    self.deck.append(card)
+                elif card > 4:
+                    self.deck.append(card)
+        elif result == "lose":
+            for i, card in enumerate(self.history):
+                if card < 4 and opponent_bet > 5:
+                    if card in self.deck:
+                        self.deck.remove(card)
+                elif card < 7 and opponent_bet > 8:
+                    if card in self.deck:
+                        self.deck.remove(card)
+        self.history = []
+        self.current_card = None
+
+
 if __name__ == "__main__":
     util.main()
-    
+
     # Test Algorithm
     # util.test()
